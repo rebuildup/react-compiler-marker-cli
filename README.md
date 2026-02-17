@@ -28,13 +28,15 @@ This is a monorepo containing:
 ```
 packages/
   server/           # LSP server (shared by all clients)
+  cli/              # CLI tool for CI/AI integration
   vscode-client/    # VS Code extension
   intellij-client/  # WebStorm/IntelliJ plugin
   nvim-client/      # Neovim plugin
 ```
 
-Each client has its own version and release cycle. See individual READMEs for client-specific documentation:
+Each package has its own version and release cycle. See individual READMEs for documentation:
 
+- [CLI Tool](packages/cli/README.md) - Check optimization status from command line
 - [VS Code Client](packages/vscode-client/README.md)
 - [IntelliJ Client](packages/intellij-client/README.md)
 - [Neovim Client](packages/nvim-client/README.md)
@@ -71,6 +73,26 @@ Open a React component file - markers appear automatically.
 **Requirements:** Neovim 0.9+ (0.10+ recommended for native inlay hints), Node.js, `babel-plugin-react-compiler` in your project.
 
 See the [Neovim Client README](packages/nvim-client/README.md) for configuration options and other package managers.
+
+### CLI
+
+For CI integration or AI assistant usage:
+
+```bash
+# Install
+npm install -g @react-compiler-marker/cli
+
+# Check files
+rcm check src/components/
+
+# JSON output for CI
+rcm check src/ --fail --json > report.json
+
+# Compact format for AI (token-efficient)
+rcm check src/ --compact
+```
+
+See the [CLI README](packages/cli/README.md) for all options.
 
 ## Configuration
 

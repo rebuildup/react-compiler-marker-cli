@@ -1,0 +1,35 @@
+{
+  "name": "@react-compiler-marker/cli",
+  "version": "1.0.0",
+  "description": "CLI tool to check React Compiler optimization status",
+  "type": "module",
+  "main": "./out/index.js",
+  "bin": {
+    "rcm": "./bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b -w"
+  },
+  "dependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/parser": "^7.26.2",
+    "babel-plugin-react-compiler": "1.0.0",
+    "globby": "^14.0.2"
+  },
+  "devDependencies": {
+    "@types/babel__core": "^7.20.5",
+    "@types/node": "20.x",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "react",
+    "compiler",
+    "cli",
+    "optimization"
+  ],
+  "license": "MIT"
+}
