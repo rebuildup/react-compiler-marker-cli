@@ -9,6 +9,7 @@ type Options = {
   json: boolean;
   compact: boolean;
   verbose: boolean;
+  all: boolean;
   fail: boolean;
   stdin: boolean;
   help: boolean;
@@ -21,6 +22,7 @@ function parseArgs(args: string[]): Options {
     json: false,
     compact: false,
     verbose: false,
+    all: false,
     fail: false,
     stdin: false,
     help: false,
@@ -41,6 +43,10 @@ function parseArgs(args: string[]): Options {
       case "--verbose":
       case "-v":
         options.verbose = true;
+        break;
+      case "--all":
+      case "-a":
+        options.all = true;
         break;
       case "--fail":
         options.fail = true;
@@ -80,6 +86,7 @@ INPUT:
   --stdin             Read from stdin
 
 OPTIONS:
+  --all, -a           Show all functions (default: failures only)
   --json              Output as JSON
   --compact           Token-efficient compact format
   --verbose           Show full error details
@@ -91,6 +98,7 @@ EXAMPLES:
   rcm check src/App.tsx
   rcm check src/components/
   rcm check "src/**/*.tsx" --json
+  rcm check src/ --all --verbose
   cat src/App.tsx | rcm check --stdin
   rcm check src/ --fail --json > report.json
 
@@ -101,10 +109,13 @@ EXIT CODES:
 `);
 }
 
-function formatCompactText(results: FileResult[]): string {
+function formatCompactText(results: FileResult[], showAll: boolean): string {
   return results
     .map((r) => {
-      const parts = r.functions.map((f) => {
+      const functions = showAll ? r.functions : r.functions.filter((f) => !f.optimized);
+      if (functions.length === 0) return null;
+
+      const parts = functions.map((f) => {
         const prefix = f.optimized ? "✓" : "✗";
         if (f.optimized) {
           return `${prefix}${f.name}:${f.line}`;
@@ -114,20 +125,22 @@ function formatCompactText(results: FileResult[]): string {
       });
       return `${r.file}: ${parts.join(" ")}`;
     })
+    .filter(Boolean)
     .join("\n");
 }
 
-function formatText(results: FileResult[], verbose: boolean): string {
+function formatText(results: FileResult[], verbose: boolean, showAll: boolean): string {
   const lines: string[] = [];
   let totalPassed = 0;
   let totalFailed = 0;
 
   for (const result of results) {
-    if (result.functions.length === 0) continue;
+    const functions = showAll ? result.functions : result.functions.filter((f) => !f.optimized);
+    if (functions.length === 0) continue;
 
     lines.push(result.file);
 
-    for (const fn of result.functions) {
+    for (const fn of functions) {
       if (fn.optimized) {
         totalPassed++;
         lines.push(`  ✓ ${fn.name}:${fn.line}`);
@@ -163,20 +176,26 @@ type CompactJsonResult = {
   fail?: Array<{ n: string; l: number; e?: string }>;
 };
 
-function formatCompactJson(results: FileResult[]): string {
-  const compact: CompactJsonResult[] = results.map((r) => {
-    const item: CompactJsonResult = { f: r.file };
-    const ok = r.functions
-      .filter((f) => f.optimized)
-      .map((f) => ({ n: f.name, l: f.line }));
-    const fail = r.functions
-      .filter((f) => !f.optimized)
-      .map((f) => ({ n: f.name, l: f.line, e: f.reason }));
+function formatCompactJson(results: FileResult[], showAll: boolean): string {
+  const compact = results
+    .map((r) => {
+      const item: CompactJsonResult = { f: r.file };
+      const ok = r.functions
+        .filter((f) => f.optimized)
+        .map((f) => ({ n: f.name, l: f.line }));
+      const fail = r.functions
+        .filter((f) => !f.optimized)
+        .map((f) => ({ n: f.name, l: f.line, e: f.reason }));
 
-    if (ok.length > 0) item.ok = ok;
-    if (fail.length > 0) item.fail = fail;
-    return item;
-  });
+      if (showAll && ok.length > 0) item.ok = ok;
+      if (fail.length > 0) item.fail = fail;
+
+      // Skip if no failures and not showing all
+      if (!showAll && fail.length === 0) return null;
+
+      return item;
+    })
+    .filter((item): item is CompactJsonResult => item !== null);
 
   return JSON.stringify(compact);
 }
@@ -194,19 +213,29 @@ type FullJsonResult = {
   error?: string;
 };
 
-function formatFullJson(results: FileResult[]): string {
-  const full: FullJsonResult[] = results.map((r) => ({
-    file: r.file,
-    functions: r.functions.map((f) => ({
-      name: f.name,
-      line: f.line,
-      optimized: f.optimized,
-      ...(f.reason && { reason: f.reason }),
-      ...(f.description && { description: f.description }),
-      ...(f.suggestions && { suggestions: f.suggestions }),
-    })),
-    ...(r.error && { error: r.error }),
-  }));
+function formatFullJson(results: FileResult[], showAll: boolean): string {
+  const full = results
+    .map((r) => {
+      const functions = showAll
+        ? r.functions
+        : r.functions.filter((f) => !f.optimized);
+
+      if (functions.length === 0) return null;
+
+      return {
+        file: r.file,
+        functions: functions.map((f) => ({
+          name: f.name,
+          line: f.line,
+          optimized: f.optimized,
+          ...(f.reason && { reason: f.reason }),
+          ...(f.description && { description: f.description }),
+          ...(f.suggestions && { suggestions: f.suggestions }),
+        })),
+        ...(r.error && { error: r.error }),
+      };
+    })
+    .filter((item): item is FullJsonResult => item !== null);
 
   return JSON.stringify(full, null, 2);
 }
@@ -291,13 +320,13 @@ async function main(): Promise<number> {
 
   // Output
   if (options.json && options.compact) {
-    console.log(formatCompactJson(results));
+    console.log(formatCompactJson(results, options.all));
   } else if (options.json) {
-    console.log(formatFullJson(results));
+    console.log(formatFullJson(results, options.all));
   } else if (options.compact) {
-    console.log(formatCompactText(results));
+    console.log(formatCompactText(results, options.all));
   } else {
-    console.log(formatText(results, options.verbose));
+    console.log(formatText(results, options.verbose, options.all));
   }
 
   // Exit code
