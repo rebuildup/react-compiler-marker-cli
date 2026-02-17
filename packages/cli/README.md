@@ -31,6 +31,7 @@ rcm check [input] [options]
 
 | Option | Description |
 |--------|-------------|
+| `--all, -a` | Show all functions (default: failures only) |
 | `--json` | Output as JSON |
 | `--compact` | Token-efficient compact format |
 | `--verbose` | Show full error details |
@@ -66,9 +67,20 @@ cat src/App.tsx | rcm check --stdin
 
 ### Output Formats
 
-**Default (human-readable):**
+**Default (failures only):**
 ```bash
 rcm check src/App.tsx
+```
+```
+src/App.tsx
+  ✗ handleClick:25 - dependency array issue
+
+0 passed, 1 failed
+```
+
+**Show all functions:**
+```bash
+rcm check src/App.tsx --all
 ```
 ```
 src/App.tsx
@@ -83,7 +95,9 @@ src/App.tsx
 rcm check src/App.tsx --compact
 ```
 ```
-src/App.tsx: ✓Counter:4 ✗handleClick:25(dependency array issue)
+src/App.tsx: ✗handleClick:25(dependency array issue)
+0 passed, 1 failed
+```
 ```
 
 **JSON (full):**
