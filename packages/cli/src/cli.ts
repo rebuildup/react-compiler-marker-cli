@@ -308,9 +308,11 @@ async function main(): Promise<number> {
       return 2;
     }
 
+    const cwd = process.cwd();
     for (const file of files) {
       const sourceCode = await fs.promises.readFile(file, "utf-8");
-      const result = checkFile(sourceCode, file);
+      const relativePath = path.relative(cwd, file);
+      const result = checkFile(sourceCode, relativePath);
       results.push(result);
     }
   } else {
