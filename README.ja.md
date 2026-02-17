@@ -74,4 +74,4 @@ src/App.tsx
 
 ## ライセンス
 
-MIT
+MIT (c) 2026 361do_sleep

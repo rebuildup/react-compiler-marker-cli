@@ -135,4 +135,4 @@ rcm check src/ --compact
 
 ## License
 
-MIT
+MIT (c) 2026 361do_sleep
