@@ -5,10 +5,10 @@ CLI tool to check React Compiler optimization status.
 ## Installation
 
 ```bash
-# Local install
-npm install @react-compiler-marker/cli
+# From source (local)
+cd packages/cli && npm link
 
-# Global install
+# From npm (when published)
 npm install -g @react-compiler-marker/cli
 ```
 
@@ -23,7 +23,7 @@ rcm check [input] [options]
 | Input | Description |
 |-------|-------------|
 | `<file>` | Single file to check |
-| `<directory>` | Recursively check `.tsx`/`.jsx` files |
+| `<directory>` | Recursively check `.tsx`/`.jsx`/`.ts`/`.js` files |
 | `<glob>` | Glob pattern (e.g., `"src/**/*.tsx"`) |
 | `--stdin` | Read from stdin |
 
@@ -52,14 +52,17 @@ rcm check [input] [options]
 ### Basic Usage
 
 ```bash
-# Check a single file
+# Check a single file (shows failures only)
 rcm check src/App.tsx
 
 # Check a directory
-rcm check src/components/
+rcm check src/
 
 # Check with glob pattern
 rcm check "src/**/*.tsx"
+
+# Show all functions (including optimized)
+rcm check src/ --all
 
 # Read from stdin
 cat src/App.tsx | rcm check --stdin
@@ -68,9 +71,6 @@ cat src/App.tsx | rcm check --stdin
 ### Output Formats
 
 **Default (failures only):**
-```bash
-rcm check src/App.tsx
-```
 ```
 src/App.tsx
   ✗ handleClick:25 - dependency array issue
@@ -78,10 +78,7 @@ src/App.tsx
 0 passed, 1 failed
 ```
 
-**Show all functions:**
-```bash
-rcm check src/App.tsx --all
-```
+**With --all:**
 ```
 src/App.tsx
   ✓ Counter:4
@@ -90,38 +87,27 @@ src/App.tsx
 1 passed, 1 failed
 ```
 
-**Compact (token-efficient for AI):**
-```bash
-rcm check src/App.tsx --compact
-```
+**Compact (--compact):**
 ```
 src/App.tsx: ✗handleClick:25(dependency array issue)
 0 passed, 1 failed
 ```
-```
 
-**JSON (full):**
-```bash
-rcm check src/App.tsx --json
-```
+**JSON (--json):**
 ```json
 [
   {
     "file": "src/App.tsx",
     "functions": [
-      { "name": "Counter", "line": 4, "optimized": true },
       { "name": "handleClick", "line": 25, "optimized": false, "reason": "dependency array issue" }
     ]
   }
 ]
 ```
 
-**JSON (compact):**
-```bash
-rcm check src/App.tsx --json --compact
-```
+**Compact JSON (--json --compact):**
 ```json
-[{"f":"src/App.tsx","ok":[{"n":"Counter","l":4}],"fail":[{"n":"handleClick","l":25,"e":"dependency array issue"}]}]
+[{"f":"src/App.tsx","fail":[{"n":"handleClick","l":25,"e":"dependency array issue"}]}]
 ```
 
 ### CI Integration
@@ -130,13 +116,13 @@ rcm check src/App.tsx --json --compact
 # Fail the build if any component is not optimized
 rcm check src/ --fail
 
-# Generate JSON report for CI
+# Generate JSON report
 rcm check src/ --fail --json > report.json
 ```
 
-### With AI Assistants
+### AI Assistant Usage
 
-The compact format is optimized for token efficiency when used with AI assistants:
+The compact format is optimized for token efficiency:
 
 ```bash
 rcm check src/ --compact
@@ -145,7 +131,7 @@ rcm check src/ --compact
 ## Requirements
 
 - Node.js 18+
-- `babel-plugin-react-compiler` (automatically installed as dependency)
+- `babel-plugin-react-compiler` (bundled)
 
 ## License
 

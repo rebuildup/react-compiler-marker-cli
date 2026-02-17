@@ -79,11 +79,14 @@ See the [Neovim Client README](packages/nvim-client/README.md) for configuration
 For CI integration or AI assistant usage:
 
 ```bash
-# Install
-npm install -g @react-compiler-marker/cli
+# Install from source
+cd packages/cli && npm link
 
-# Check files
-rcm check src/components/
+# Check files (shows failures only by default)
+rcm check src/
+
+# Show all functions including optimized
+rcm check src/ --all
 
 # JSON output for CI
 rcm check src/ --fail --json > report.json
