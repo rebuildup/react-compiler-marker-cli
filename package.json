@@ -11,6 +11,7 @@
     ".": "./out/index.js",
     "./checker": "./out/checker.js"
   },
+  "sideEffects": false,
   "files": [
     "out",
     "bin"
