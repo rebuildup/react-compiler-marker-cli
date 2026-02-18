@@ -9,6 +9,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "sourceMap": true,
     "declarationMap": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
