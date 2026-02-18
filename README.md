@@ -5,13 +5,14 @@ CLI tool to check React Compiler optimization status.
 ## Installation
 
 ```bash
-npm install -g @react-compiler-marker/cli
-```
+# Install from GitHub
+npm install -g rebuildup/react-compiler-marker-cli
 
-Or use with npx:
-
-```bash
-npx @react-compiler-marker/cli check src/
+# Or clone and link locally
+git clone https://github.com/rebuildup/react-compiler-marker-cli.git
+cd react-compiler-marker-cli
+npm install
+npm link
 ```
 
 ## Usage
