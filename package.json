@@ -35,6 +35,9 @@
     "@types/node": "20.x",
     "typescript": "^5.7.2"
   },
+  "overrides": {
+    "@babel/helpers": ">=7.26.10"
+  },
   "engines": {
     "node": ">=18"
   },
