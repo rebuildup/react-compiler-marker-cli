@@ -5,8 +5,8 @@ CLI tool to check React Compiler optimization status.
 ## Installation
 
 ```bash
-# Install from GitHub
-npm install -g rebuildup/react-compiler-marker-cli
+# Install from GitHub (HTTPS)
+npm install -g git+https://github.com/rebuildup/react-compiler-marker-cli.git
 
 # Or clone and link locally
 git clone https://github.com/rebuildup/react-compiler-marker-cli.git
