@@ -77,23 +77,17 @@ function loadPlugin(): PluginObj | undefined {
   }
 }
 
-export function checkFile(sourceCode: string, filename: string): FileResult {
-  const functions: FunctionResult[] = [];
-
-  const plugin = loadPlugin();
-  if (!plugin) {
-    return {
-      file: filename,
-      functions: [],
-      error: "babel-plugin-react-compiler not found",
-    };
-  }
-
-  const successfulCompilations: Array<LoggerEvent> = [];
-  const failedCompilations: Array<LoggerEvent> = [];
+// Creates a logger that collects compilation events
+function createLogger(): {
+  logger: { logEvent: (filename: string | null, event: LoggerEvent) => void };
+  successfulCompilations: LoggerEvent[];
+  failedCompilations: LoggerEvent[];
+} {
+  const successfulCompilations: LoggerEvent[] = [];
+  const failedCompilations: LoggerEvent[] = [];
 
   const logger = {
-    logEvent(filename: string | null, rawEvent: LoggerEvent) {
+    logEvent(filename: string | null, rawEvent: LoggerEvent): void {
       const event = { ...rawEvent, filename };
       switch (event.kind) {
         case "CompileSuccess":
@@ -108,48 +102,91 @@ export function checkFile(sourceCode: string, filename: string): FileResult {
     },
   };
 
+  return { logger, successfulCompilations, failedCompilations };
+}
+
+// Creates parser options based on file extension
+function createParserOptions(filename: string): BabelParser.ParserOptions {
+  const language = getLanguageFromFilename(filename);
+  return {
+    sourceFilename: filename,
+    plugins: [language, "jsx"],
+    sourceType: "module",
+  };
+}
+
+// Runs Babel transformation with React Compiler plugin
+function runCompilation(
+  sourceCode: string,
+  filename: string,
+  plugin: PluginObj,
+  logger: { logEvent: (filename: string | null, event: LoggerEvent) => void }
+): void {
+  const ast = BabelParser.parse(sourceCode, createParserOptions(filename));
+
+  transformFromAstSync(ast, sourceCode, {
+    filename,
+    highlightCode: false,
+    retainLines: true,
+    plugins: [[plugin, { ...DEFAULT_COMPILER_OPTIONS, logger, noEmit: true }]],
+    sourceType: "module",
+    configFile: false,
+    babelrc: false,
+  });
+}
+
+// Converts a compiler event to a FunctionResult
+function eventToFunctionResult(event: LoggerEvent, optimized: boolean): FunctionResult {
+  return {
+    name: event.fnName || "anonymous",
+    line: event.fnLoc?.start?.line || 1,
+    optimized,
+    ...(optimized ? {} : {
+      reason: event.detail?.reason,
+      description: event.detail?.description,
+      suggestions: event.detail?.suggestions,
+    }),
+  };
+}
+
+// Collects function results from compilation events
+function collectResults(
+  successful: LoggerEvent[],
+  failed: LoggerEvent[]
+): FunctionResult[] {
+  const results: FunctionResult[] = [];
+
+  for (const event of successful) {
+    results.push(eventToFunctionResult(event, true));
+  }
+
+  for (const event of failed) {
+    results.push(eventToFunctionResult(event, false));
+  }
+
+  return results;
+}
+
+export function checkFile(sourceCode: string, filename: string): FileResult {
+  const plugin = loadPlugin();
+  if (!plugin) {
+    return {
+      file: filename,
+      functions: [],
+      error: "babel-plugin-react-compiler not found",
+    };
+  }
+
+  const { logger, successfulCompilations, failedCompilations } = createLogger();
+
   try {
-    const language = getLanguageFromFilename(filename);
-    const ast = BabelParser.parse(sourceCode, {
-      sourceFilename: filename,
-      plugins: [language, "jsx"],
-      sourceType: "module",
-    });
-
-    transformFromAstSync(ast, sourceCode, {
-      filename,
-      highlightCode: false,
-      retainLines: true,
-      plugins: [[plugin, { ...DEFAULT_COMPILER_OPTIONS, logger, noEmit: true }]],
-      sourceType: "module",
-      configFile: false,
-      babelrc: false,
-    });
-
-    for (const event of successfulCompilations) {
-      functions.push({
-        name: event.fnName || "anonymous",
-        line: event.fnLoc?.start?.line || 1,
-        optimized: true,
-      });
-    }
-
-    for (const event of failedCompilations) {
-      functions.push({
-        name: event.fnName || "anonymous",
-        line: event.fnLoc?.start?.line || 1,
-        optimized: false,
-        reason: event.detail?.reason,
-        description: event.detail?.description,
-        suggestions: event.detail?.suggestions,
-      });
-    }
-
+    runCompilation(sourceCode, filename, plugin, logger);
+    const functions = collectResults(successfulCompilations, failedCompilations);
     return { file: filename, functions };
   } catch (error: unknown) {
     return {
       file: filename,
-      functions,
+      functions: [],
       error: error instanceof Error ? error.message : "Unknown error",
     };
   }
