@@ -129,7 +129,7 @@ export function checkFile(sourceCode: string, filename: string): FileResult {
     for (const event of successfulCompilations) {
       functions.push({
         name: event.fnName || "anonymous",
-        line: event.fnLoc?.start?.line || 0,
+        line: event.fnLoc?.start?.line || 1,
         optimized: true,
       });
     }
@@ -137,7 +137,7 @@ export function checkFile(sourceCode: string, filename: string): FileResult {
     for (const event of failedCompilations) {
       functions.push({
         name: event.fnName || "anonymous",
-        line: event.fnLoc?.start?.line || 0,
+        line: event.fnLoc?.start?.line || 1,
         optimized: false,
         reason: event.detail?.reason,
         description: event.detail?.description,

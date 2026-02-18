@@ -243,26 +243,31 @@ function formatFullJson(results: FileResult[], showAll: boolean): string {
 async function getFiles(input: string | null): Promise<string[]> {
   if (!input) return [];
 
-  const stat = await fs.promises.stat(input).catch(() => null);
-  if (!stat) return [];
+  try {
+    const stat = await fs.promises.stat(input);
 
-  if (stat.isFile()) {
-    return [input];
-  }
+    if (stat.isFile()) {
+      return [input];
+    }
 
-  if (stat.isDirectory()) {
-    return globby(["**/*.{tsx,jsx,ts,js}"], {
-      cwd: input,
+    if (stat.isDirectory()) {
+      return globby(["**/*.{tsx,jsx,ts,js}"], {
+        cwd: input,
+        absolute: true,
+        ignore: ["**/node_modules/**", "**/dist/**", "**/build/**"],
+      });
+    }
+
+    // Treat as glob pattern
+    return globby([input], {
       absolute: true,
       ignore: ["**/node_modules/**", "**/dist/**", "**/build/**"],
     });
+  } catch (error) {
+    // Re-throw with context
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to access "${input}": ${message}`);
   }
-
-  // Treat as glob pattern
-  return globby([input], {
-    absolute: true,
-    ignore: ["**/node_modules/**", "**/dist/**", "**/build/**"],
-  });
 }
 
 async function readStdin(): Promise<string> {
@@ -310,13 +315,31 @@ async function main(): Promise<number> {
 
     const cwd = process.cwd();
     for (const file of files) {
-      const sourceCode = await fs.promises.readFile(file, "utf-8");
-      const relativePath = path.relative(cwd, file);
-      const result = checkFile(sourceCode, relativePath);
-      results.push(result);
+      try {
+        const sourceCode = await fs.promises.readFile(file, "utf-8");
+        const relativePath = path.relative(cwd, file);
+        const result = checkFile(sourceCode, relativePath);
+        results.push(result);
+      } catch (error) {
+        const relativePath = path.relative(cwd, file);
+        const message = error instanceof Error ? error.message : String(error);
+        console.error(`${relativePath}: Error reading file - ${message}`);
+        results.push({
+          file: relativePath,
+          functions: [],
+          error: message,
+        });
+      }
     }
   } else {
     showHelp();
+    return 2;
+  }
+
+  // Check for compilation errors before output
+  const hasErrors = results.some((r) => r.error !== undefined);
+  if (hasErrors) {
+    // Return exit code 2 for compilation/file errors
     return 2;
   }
 
