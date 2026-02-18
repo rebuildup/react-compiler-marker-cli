@@ -12,6 +12,9 @@ export default [
 
     languageOptions: {
       parser: tsParser,
+      parserOptions: {
+        project: "./tsconfig.json",
+      },
       ecmaVersion: 2022,
       sourceType: "module",
     },
@@ -25,9 +28,16 @@ export default [
         },
       ],
 
-      curly: "warn",
-      eqeqeq: "warn",
-      "no-throw-literal": "warn",
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unnecessary-condition": "warn",
+      "@typescript-eslint/prefer-nullish-coalescing": "warn",
+      "@typescript-eslint/prefer-optional-chain": "warn",
+      "@typescript-eslint/strict-boolean-expressions": "warn",
+
+      curly: "error",
+      eqeqeq: "error",
+      "no-throw-literal": "error",
       semi: "warn",
     },
   },

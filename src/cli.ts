@@ -62,7 +62,7 @@ function parseArgs(args: string[]): Options {
         options.version = true;
         break;
       default:
-        if (!arg.startsWith("-")) {
+        if (arg && !arg.startsWith("-")) {
           options.input = arg;
         }
         break;
@@ -115,15 +115,17 @@ function formatCompactText(results: FileResult[], showAll: boolean): string {
       const functions = showAll ? r.functions : r.functions.filter((f) => !f.optimized);
       if (functions.length === 0) return null;
 
+      const filePrefix = `${r.file}:`;
       const parts = functions.map((f) => {
         const prefix = f.optimized ? "✓" : "✗";
+        const namePrefix = `${filePrefix}${f.name}`;
         if (f.optimized) {
-          return `${prefix}${f.name}:${f.line}`;
+          return `${namePrefix}:${f.line} ${prefix}`;
         }
         const reason = f.reason ? `(${f.reason.slice(0, 20)})` : "";
-        return `${prefix}${f.name}:${f.line}${reason}`;
+        return `${namePrefix}:${f.line}${reason} ${prefix}`;
       });
-      return `${r.file}: ${parts.join(" ")}`;
+      return parts.join(" ");
     })
     .filter(Boolean)
     .join("\n");
