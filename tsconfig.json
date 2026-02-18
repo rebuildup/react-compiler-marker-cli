@@ -6,6 +6,11 @@
     "outDir": "./out",
     "rootDir": "./src",
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "declarationMap": true,
+    "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true

@@ -62,7 +62,7 @@ function parseArgs(args: string[]): Options {
         options.version = true;
         break;
       default:
-        if (!arg.startsWith("-")) {
+        if (arg && !arg.startsWith("-")) {
           options.input = arg;
         }
         break;

@@ -89,7 +89,7 @@ describe('checkFile', () => {
     `;
     const result = checkFile(code, 'test.tsx');
     if (result.functions.length > 0) {
-      expect(result.functions[0].line).toBeGreaterThan(0);
+      expect(result.functions[0]?.line).toBeGreaterThan(0);
     }
   });
 
