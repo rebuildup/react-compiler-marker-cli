@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { checkFile } from './checker';
+import { checkFile } from './checker.js';
 
 describe('getLanguageFromFilename', () => {
   // This function is not exported, so we test through checkFile behavior
@@ -77,7 +77,7 @@ describe('checkFile', () => {
       }
     `;
     const result = checkFile(code, 'test.tsx');
-    const fn = result.functions.find((f) => f.name === 'MyComponent');
+    const fn = result.functions.find((f: { name: string }) => f.name === 'MyComponent');
     expect(fn).toBeDefined();
   });
 
@@ -114,7 +114,7 @@ describe('FunctionResult type', () => {
       }
     `;
     const result = checkFile(code, 'test.tsx');
-    const optimizedFunctions = result.functions.filter((f) => f.optimized);
+    const optimizedFunctions = result.functions.filter((f: { optimized: boolean }) => f.optimized);
     // At least one function should have optimization status
     expect(result.functions.length).toBeGreaterThan(0);
   });
@@ -127,11 +127,11 @@ describe('FunctionResult type', () => {
     `;
     const result = checkFile(code, 'test.tsx');
     // Check if failed compilations have reasons
-    const failedFunctions = result.functions.filter((f) => !f.optimized);
+    const failedFunctions = result.functions.filter((f: { optimized: boolean }) => !f.optimized);
     failedFunctions.forEach((fn) => {
       if (!fn.optimized) {
         // reason might be undefined for some failures
-        expect(typeof fn.reason).toBe('string' || 'undefined');
+        expect(fn.reason === undefined || typeof fn.reason === 'string').toBe(true);
       }
     });
   });

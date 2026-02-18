@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { FileResult } from './checker';
+import type { FileResult } from './checker.js';
 
 // Import format functions by re-implementing them for testing
 // since they're not exported from cli.ts
