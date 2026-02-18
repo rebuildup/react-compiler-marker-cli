@@ -11,11 +11,13 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declarationMap": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./out/.tsbuildinfo",
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "out"]
+  "exclude": ["node_modules", "out", "out/.tsbuildinfo"]
 }
