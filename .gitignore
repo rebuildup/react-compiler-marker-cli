@@ -1,5 +1,3 @@
-out
-node_modules
+node_modules/
+out/
 *.tsbuildinfo
-.DS_Store
-.idea
