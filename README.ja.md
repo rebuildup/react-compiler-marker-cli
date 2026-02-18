@@ -5,7 +5,17 @@ React Compilerの最適化状態をチェックするCLIツール
 ## インストール
 
 ```bash
-cd packages/cli && npm link
+npm install -g @react-compiler-marker/cli
+```
+
+ローカルで開発する場合:
+
+```bash
+git clone https://github.com/rebuildup/react-compiler-marker-cli.git
+cd react-compiler-marker-cli
+npm install
+npm run build
+npm link
 ```
 
 ## 使い方
@@ -71,6 +81,10 @@ src/App.tsx
 ## 要件
 
 - Node.js 18+
+
+## リポジトリ
+
+https://github.com/rebuildup/react-compiler-marker-cli
 
 ## ライセンス
 

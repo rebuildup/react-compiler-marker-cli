@@ -1,129 +1,77 @@
-# Contributing to React Compiler Marker
+# Contributing
 
-## Prerequisites
+Thank you for your interest in contributing to React Compiler Marker CLI!
 
-- Node.js 20+
-- npm 9+
-- JDK 21 (for IntelliJ plugin development)
-
-## Getting Started
+## Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/blazejkustra/react-compiler-marker.git
-cd react-compiler-marker
+git clone https://github.com/rebuildup/react-compiler-marker-cli.git
+cd react-compiler-marker-cli
 
 # Install dependencies
 npm install
+
+# Build the project
+npm run build
+```
+
+## Development
+
+```bash
+# Watch mode for development
+npm run dev
+
+# Run tests
+npm test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
 ```
 
 ## Project Structure
 
 ```
-packages/
-  server/           # LSP server (TypeScript)
-  vscode-client/    # VS Code extension (TypeScript)
-  intellij-client/  # WebStorm/IntelliJ plugin (Kotlin)
+react-compiler-marker-cli/
+├── src/
+│   ├── cli.ts       # CLI entry point, argument parsing, output formatting
+│   ├── checker.ts   # Core: runs babel-plugin-react-compiler
+│   ├── cli.test.ts  # CLI format function tests
+│   └── checker.test.ts # Checker function tests
+├── bin/
+│   └── cli.js       # Compiled CLI entry point
+├── out/             # Compiled TypeScript output (generated)
+├── vitest.config.ts # Vitest configuration
+├── tsconfig.json    # TypeScript configuration
+└── package.json
 ```
 
-### Server
+## Running Tests Locally
 
-The LSP server is shared by all clients. It handles React Compiler analysis and provides language server protocol support.
+Before submitting a PR, please:
 
-```bash
-cd packages/server
-npm run build
-npm run watch
-```
+1. Ensure all tests pass: `npm test`
+2. Build the project: `npm run build`
+3. Test the CLI manually: `node bin/cli.js --help`
 
-### VS Code Client
+## Submitting Changes
 
-```bash
-cd packages/vscode-client
-
-# Build extension
-npm run compile
-
-# Watch mode
-npm run watch
-
-# Run tests
-npm run test
-
-# Package for distribution
-npm run package
-```
-
-To debug the extension:
-1. Open the project in VS Code
-2. Press F5 to launch Extension Development Host
-
-### IntelliJ Client
-
-```bash
-cd packages/intellij-client
-
-# Build plugin
-./gradlew buildPlugin
-
-# Run in development IDE
-./gradlew runIde
-
-# The built plugin is at build/distributions/react-compiler-marker-*.zip
-```
+1. Fork the repository
+2. Create a branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "Add some feature"`
+4. Push to the branch: `git push origin feature/your-feature`
+5. Open a Pull Request
 
 ## Code Style
 
-- TypeScript: ESLint + Prettier (run `npm run prettier` from root)
-- Kotlin: Default IntelliJ formatter
+- Use TypeScript for all new code
+- Follow existing code style
+- Add tests for new features
+- Update documentation as needed
 
-## Testing
+## License
 
-```bash
-# From root - shared checks
-npm run typecheck
-npm run lint
-npm run prettier
-
-# From packages/vscode-client - extension tests
-cd packages/vscode-client
-npm run test
-```
-
-## Versioning
-
-Each client has its own version:
-
-| Package | Version Location |
-|---------|------------------|
-| VS Code Client | `packages/vscode-client/package.json` |
-| IntelliJ Client | `packages/intellij-client/gradle.properties` |
-| Server | `packages/server/package.json` |
-
-## Releasing
-
-### VS Code Extension
-
-1. Create a GitHub release with tag `vscode-v{version}` (e.g., `vscode-v1.3.5`)
-2. Add release notes in the release body - these will be added to CHANGELOG.md
-3. CI will automatically update `package.json` version and publish to VS Code Marketplace and Open VSX
-
-### IntelliJ Plugin
-
-1. Create a GitHub release with tag `intellij-v{version}` (e.g., `intellij-v1.0.0`)
-2. Add release notes in the release body - these will be added to CHANGELOG.md
-3. CI will automatically update `gradle.properties` version, build the plugin, and attach it to the release
-
-## Adding a New Client
-
-To add support for a new IDE:
-
-1. Create a new package in `packages/` (e.g., `packages/neovim-client/`)
-2. Use the LSP server via stdio mode: `node server.bundle.js --stdio`
-3. Implement the client-side UI for displaying inlay hints
-4. Add documentation to your client's README
-5. Update the release workflow if needed
-
-## Questions?
-
-Open an issue on [GitHub](https://github.com/blazejkustra/react-compiler-marker/issues).
+By contributing, you agree that your contributions will be licensed under the MIT License.
