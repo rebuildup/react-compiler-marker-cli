@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "CLI tool to check React Compiler optimization status",
   "type": "module",
-  "main": "./out/index.js",
+  "main": "./out/cli.js",
   "bin": {
     "rcm": "./bin/cli.js"
+  },
+  "exports": {
+    ".": "./out/index.js",
+    "./checker": "./out/checker.js"
   },
   "files": [
     "out",
