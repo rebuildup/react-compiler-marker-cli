@@ -32,3 +32,6 @@ jobs:
 
       - name: Test CLI
         run: node bin/cli.js --help
+
+      - name: Run tests
+        run: npm test
