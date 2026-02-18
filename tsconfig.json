@@ -1,7 +1,15 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./packages/server" },
-    { "path": "./packages/vscode-client" }
-  ]
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./out",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "declaration": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "out"]
 }

@@ -1,11 +1,17 @@
-# React Compiler Marker CLI
+# @react-compiler-marker/cli
 
 CLI tool to check React Compiler optimization status.
 
 ## Installation
 
 ```bash
-cd packages/cli && npm link
+npm install -g @react-compiler-marker/cli
+```
+
+Or use with npx:
+
+```bash
+npx @react-compiler-marker/cli check src/
 ```
 
 ## Usage
@@ -32,6 +38,8 @@ rcm check [input] [options]
 | `--compact` | Token-efficient compact format |
 | `--verbose` | Show full error details |
 | `--fail` | Exit with code 1 if any function is not optimized |
+| `--help, -h` | Show help |
+| `--version` | Show version |
 
 ## Examples
 
@@ -47,6 +55,15 @@ rcm check src/ --fail --json > report.json
 
 # Compact format for AI
 rcm check src/ --compact
+
+# Check single file
+rcm check src/App.tsx
+
+# Use glob pattern
+rcm check "src/**/*.tsx"
+
+# Read from stdin
+cat src/App.tsx | rcm check --stdin
 ```
 
 ## Output
@@ -68,9 +85,54 @@ src/App.tsx
 1 passed, 1 failed
 ```
 
+**JSON output (--json):**
+```json
+[
+  {
+    "file": "src/App.tsx",
+    "functions": [
+      {
+        "name": "handleClick",
+        "line": 25,
+        "optimized": false,
+        "reason": "dependency array issue"
+      }
+    ]
+  }
+]
+```
+
+**Compact format (--compact):**
+```
+src/App.tsx: ✗handleClick:25(dependency array issue)
+```
+
+## Exit Codes
+
+| Code | Description |
+|------|-------------|
+| 0 | Success (all optimized or `--fail` not set) |
+| 1 | Not optimized (`--fail` set and unoptimized functions found) |
+| 2 | Error (file not found, parse error, etc.) |
+
+## CI Integration
+
+Use `--fail` to exit with code 1 when unoptimized functions are found:
+
+```yaml
+# GitHub Actions example
+- name: Check React Compiler optimization
+  run: rcm check src/ --fail
+```
+
 ## Requirements
 
 - Node.js 18+
+
+## Related
+
+- [React Compiler](https://react.dev/learn/react-compiler)
+- [babel-plugin-react-compiler](https://www.npmjs.com/package/babel-plugin-react-compiler)
 
 ## License
 

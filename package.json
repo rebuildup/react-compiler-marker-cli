@@ -1,31 +1,49 @@
 {
-  "name": "react-compiler-marker",
-  "private": true,
-  "description": "React Compiler Marker IDE extensions",
-  "author": "Blazej Kustra <kustrablazej@gmail.com>",
-  "license": "MIT",
+  "name": "@react-compiler-marker/cli",
+  "version": "1.0.0",
+  "description": "CLI tool to check React Compiler optimization status",
+  "type": "module",
+  "main": "./out/index.js",
+  "bin": {
+    "rcm": "./bin/cli.js"
+  },
+  "files": ["out", "bin"],
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b -w",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/blazejkustra/react-compiler-marker"
+    "url": "git+https://github.com/blazejkustra/react-compiler-marker-cli.git"
   },
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "typecheck": "tsc -b --noEmit",
-    "lint": "eslint \"packages/*/src/**/*.ts\"",
-    "prettier": "prettier --check \"packages/*/src/**/*.ts\"",
-    "prettier:write": "prettier --write \"packages/*/src/**/*.ts\""
+  "homepage": "https://github.com/blazejkustra/react-compiler-marker-cli#readme",
+  "bugs": {
+    "url": "https://github.com/blazejkustra/react-compiler-marker-cli/issues"
+  },
+  "dependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/parser": "^7.26.2",
+    "babel-plugin-react-compiler": "1.0.0",
+    "globby": "^14.0.2"
   },
   "devDependencies": {
     "@types/babel__core": "^7.20.5",
-    "@types/babel__traverse": "^7.20.6",
     "@types/node": "20.x",
-    "@types/react": "^19.1.11",
-    "@typescript-eslint/eslint-plugin": "^8.10.0",
-    "@typescript-eslint/parser": "^8.7.0",
-    "eslint": "^9.13.0",
-    "prettier": "3.7.4",
-    "typescript": "^5.6.3"
-  }
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "react",
+    "compiler",
+    "cli",
+    "optimization"
+  ],
+  "license": "MIT",
+  "author": "Blazej Kustra <kustrablazej@gmail.com>"
 }

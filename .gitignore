@@ -1,13 +1,5 @@
-**/out
-**/dist
-**/node_modules
-**/.vscode-test/
-*.vsix
-**/tsconfig.tsbuildinfo
-**/.DS_Store
+out
+node_modules
+*.tsbuildinfo
+.DS_Store
 .idea
-
-# Neovim plugin files (copied during build)
-/lua
-/plugin
-/server
