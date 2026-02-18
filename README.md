@@ -4,21 +4,36 @@ CLI tool to check React Compiler optimization status. Displays which components/
 
 ## Installation
 
-> **Note**: This package is not yet published to npm. To use it:
+> **Note**: This package is not yet published to npm.
+
+### Option 1: Build and link globally (Use `rcm` command everywhere)
 
 ```bash
-# Clone and build locally
+# Clone and build
+git clone https://github.com/rebuildup/react-compiler-marker-cli.git
+cd react-compiler-marker-cli
+npm install
+npm run build
+
+# Link globally - creates the `rcm` command
+npm link
+
+# Now you can use `rcm` anywhere
+rcm check src/App.tsx
+```
+
+### Option 2: Use with npx directly
+
+```bash
+# Run directly from GitHub (no installation required)
+npx github:rebuildup/react-compiler-marker-cli check <file>
+
+# Or clone and run with npx
 git clone https://github.com/rebuildup/react-compiler-marker-cli.git
 cd react-compiler-marker-cli
 npm install
 npm run build
 npx . check <file>
-```
-
-Or use with `npx` directly from the repository:
-
-```bash
-npx github:rebuildup/react-compiler-marker-cli check <file>
 ```
 
 ## Usage
